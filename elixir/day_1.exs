@@ -5,7 +5,8 @@ defmodule Trebuchet do
     chars = String.graphemes(value)
     first_digit = Enum.find(chars, 0, &(&1 =~ ~r/[0-9]/))
     last_digit = Enum.find(Enum.reverse(chars), 0, &(&1 =~ ~r/[0-9]/))
-    sum = String.to_integer(first_digit <> last_digit) + initial_value
+    two_digit_number= String.to_integer(first_digit <> last_digit)
+    sum = two_digit_number + initial_value
     get_calibration_value(values, sum)
   end
 
@@ -14,4 +15,4 @@ defmodule Trebuchet do
   end
 end
 
-File.stream!("./input.txt") |> Enum.to_list |> Trebuchet.get_calibration_value |> IO.puts
+File.stream!("./AdventCode/day_1_input.txt") |> Enum.to_list |> Trebuchet.get_calibration_value |> IO.puts
