@@ -1,4 +1,4 @@
-defmodule NumberSpelledOut do
+defmodule DigitSpelledOut do
   def as_number(_value = "one"), do: "1"
   def as_number(_value = "two"), do: "2"
   def as_number(_value = "three"), do: "3"
@@ -43,9 +43,7 @@ defmodule NumberSpelledOut do
         false
     end
   end
-end
 
-defmodule Calculator do
   def get_digit(chars, add_number, temp \\ "") do
     cond do
       Enum.empty?(chars) ->
@@ -60,8 +58,8 @@ defmodule Calculator do
         [head | tail] = chars
         number = temp <> head
 
-        if(NumberSpelledOut.can_be_number?(number)) do
-          digit = NumberSpelledOut.as_number(number)
+        if(DigitSpelledOut.can_be_number?(number)) do
+          digit = DigitSpelledOut.as_number(number)
 
           if digit do
             add_number.(digit)
@@ -80,48 +78,3 @@ defmodule Calculator do
     value =~ ~r/[0-9]/
   end
 end
-
-defmodule Machine do
-  def compute(word) do
-    chars = String.graphemes(word)
-    {:ok, numbers} = Agent.start_link(fn -> [] end)
-
-    Calculator.get_digit(chars, fn number ->
-      Agent.update(numbers, &[number | &1])
-    end)
-
-    numbers_found = Agent.get(numbers, & &1)
-    numbers_found = Enum.reverse(numbers_found)
-    first_digit = Enum.at(numbers_found, 0)
-    [_ | tail] = numbers_found
-    last_digit = Enum.at(tail, length(tail) - 1)
-
-    # Uncomment this to see results
-    # IO.puts("#{word} Head -> #{first_digit} Tail -> #{last_digit}")
-
-    Agent.stop(numbers)
-
-    cond do
-      first_digit == nil ->
-        0
-
-      last_digit == nil ->
-        String.to_integer(first_digit <> first_digit)
-
-      true ->
-        String.to_integer(first_digit <> last_digit)
-    end
-  end
-end
-
-defmodule Main do
-  def run do
-    File.stream!("./AdventCode/day_1/calibration_document_part_two.txt")
-    |> Enum.to_list()
-    |> Enum.map(&Machine.compute(&1))
-    |> Enum.sum()
-    |> IO.puts()
-  end
-end
-
-Main.run()
